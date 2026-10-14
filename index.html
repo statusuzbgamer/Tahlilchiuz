@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SocialStat — Statistika va video tahlil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--a1:#667eea;--a2:#764ba2;--g:rgba(255,255,255,.05);--b:rgba(255,255,255,.1);--m:rgba(255,255,255,.6);--ok:#34d399;--err:#f87171}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',system-ui,sans-serif;background:#050508;color:#fff;min-height:100vh;background-image:radial-gradient(circle at 15% 0%,rgba(102,126,234,.25),transparent 45%),radial-gradient(circle at 90% 10%,rgba(118,75,162,.2),transparent 40%);background-attachment:fixed}
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 20px;background:rgba(5,5,8,.55);backdrop-filter:blur(14px);border-bottom:1px solid var(--b)}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px}
+.dot{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);display:grid;place-items:center}
+.dot i{width:10px;height:10px;background:#fff;border-radius:50%;animation:p 2s infinite}
+@keyframes p{50%{opacity:.3}}
+.brand b{background:linear-gradient(90deg,#fff,#a5b4fc);-webkit-background-clip:text;color:transparent}
+.hbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+input,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--b);background:rgba(255,255,255,.04);color:#fff;font:inherit;outline:none}
+input:focus,select:focus{border-color:var(--a1)}
+select option{background:#111}
+.secret{width:160px}
+main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
+.card{background:var(--g);border:1px solid var(--b);border-radius:20px;padding:24px;backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,.3);margin-bottom:22px}
+h2{font-size:22px;margin-bottom:14px}
+h3{font-size:16px;margin-bottom:8px}
+.muted{color:var(--m)}
+.small{font-size:13px}
+.ok{color:var(--ok)}
+.err{color:var(--err);margin-top:10px;font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1;min-width:180px}
+.btn{padding:12px 22px;border-radius:14px;border:1px solid var(--b);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-weight:500;cursor:pointer;transition:.25s}
+.btn:hover{background:rgba(255,255,255,.15)}
+.btn.p{background:linear-gradient(90deg,var(--a1),var(--a2));border:none;box-shadow:0 10px 20px rgba(102,126,234,.3)}
+.btn.p:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(102,126,234,.4)}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:10px;flex:0 0 auto}
+.btn.danger{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.4)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.full{width:100%}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tabs button{padding:8px 14px;border-radius:10px;border:1px solid var(--b);background:transparent;color:var(--m);cursor:pointer;font:inherit}
+.tabs button.on{color:#fff;background:rgba(102,126,234,.2);border-color:rgba(102,126,234,.5)}
+.pill{display:inline-block;padding:5px 12px;border-radius:999px;background:rgba(102,126,234,.1);border:1px solid rgba(102,126,234,.3);color:#a5b4fc;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.stat{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:16px;padding:16px}
+.stat small{color:var(--m);font-size:12px}
+.stat div{font-size:24px;font-weight:700;margin-top:4px}
+.chart{display:flex;align-items:flex-end;gap:6px;height:170px;margin-top:10px}
+.bar{flex:1;height:100%;display:flex;align-items:flex-end}
+.bar span{width:100%;border-radius:8px 8px 2px 2px;background:linear-gradient(to top,var(--a1),var(--a2));display:block}
+.flex{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.thumb{width:100%;max-width:280px;border-radius:14px;border:1px solid var(--b)}
+.avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--b)}
+ul.notes{margin:10px 0 0 18px;color:var(--m);line-height:1.8}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px}
+.plan{border:1px solid var(--b);border-radius:18px;padding:18px;background:rgba(255,255,255,.03)}
+.plan .price{font-size:22px;font-weight:700;margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:10px;border-bottom:1px solid var(--b);text-align:left}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:50;display:grid;place-items:center;padding:16px}
+.panel{width:min(900px,100%);max-height:90vh;overflow:auto;background:#0b0b12;border:1px solid var(--b);border-radius:22px;padding:24px}
+.ptop{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.x{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+.field{margin-bottom:12px;flex:1;min-width:180px}
+.field label{display:block;font-size:13px;color:var(--m);margin-bottom:6px}
+.auth{max-width:420px;margin:40px auto}
+.auth form{display:grid;gap:12px;margin-top:6px}
+.req{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><div class="dot"><i></i></div><b id="siteName">SocialStat</b></div>
+  <div class="hbar">
+    <input id="secret" class="secret" type="password" placeholder="Sirli kod" autocomplete="off"/>
+    <div id="userBar" class="hbar"></div>
+  </div>
+</header>
+
+<main id="app"></main>
+<div id="adminWrap"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const j=r=>r.json().then(d=>{if(d.error)throw new Error(d.error.message);return d});
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=n=>Number(n||0).toLocaleString("en-US");
+const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+const hash=s=>{let h=5381;for(const c of s)h=((h<<5)+h+c.charCodeAt(0))|0;return String(h)};
+const DB={g:(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},s:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
+const YT="https://www.googleapis.com/youtube/v3/";
+
+const DEFAULTS={ytKey:"",igToken:"",igUserId:"",freeAnalyses:1,maxDuration:180,siteName:"SocialStat",cardInfo:"",
+  plans:[{id:"basic",name:"Basic",price:"29 000 so'm",analyses:10},{id:"pro",name:"Pro",price:"99 000 so'm",analyses:50}]};
+let settings={...DEFAULTS,...DB.g("ss_settings",{})};
+let users=DB.g("ss_users",[]),requests=DB.g("ss_requests",[]),session=DB.g("ss_session",null);
+
+let authTab="login",platform="youtube",statRes=null,statErr="",vidRes=null,vidErr="",busy=false;
+let adminOpen=false,adminTab="settings",qVal="",vVal="";
+
+const save=()=>{DB.s("ss_settings",settings);DB.s("ss_users",users);DB.s("ss_requests",requests);DB.s("ss_session",session)};
+const me=()=>users.find(u=>u.id===session);
+
+/* ---------- API ---------- */
+async function getYT(q){
+  if(!settings.ytKey)throw new Error("Admin YouTube API kalitini sozlamagan");
+  const ch=q.match(/channel\/(UC[\w-]+)/),h=q.match(/@([\w.-]+)/);
+  const param=ch?`id=${ch[1]}`:`forHandle=@${(h?h[1]:q).replace(/^@/,"")}`;
+  const c=(await fetch(`${YT}channels?part=snippet,statistics,contentDetails&${param}&key=${settings.ytKey}`).then(j)).items?.[0];
+  if(!c)throw new Error("Kanal topilmadi");
+  const pl=await fetch(`${YT}playlistItems?part=contentDetails&maxResults=10&playlistId=${c.contentDetails.relatedPlaylists.uploads}&key=${settings.ytKey}`).then(j);
+  const ids=pl.items.map(i=>i.contentDetails.videoId).join(",");
+  const vs=ids?await fetch(`${YT}videos?part=statistics,snippet&id=${ids}&key=${settings.ytKey}`).then(j):{items:[]};
+  return{platform:"YouTube",name:c.snippet.title,avatar:c.snippet.thumbnails.default.url,
+    followers:+c.statistics.subscriberCount||0,total:+c.statistics.viewCount||0,count:+c.statistics.videoCount||0,
+    recent:vs.items.map(v=>({title:v.snippet.title,views:+v.statistics.viewCount||0}))};
+}
+
+async function getIG(name){
+  if(!settings.igToken||!settings.igUserId)throw new Error("Admin Instagram token va User ID ni sozlamagan");
+  const u=name.replace(/^@/,"").trim();
+  const f=`business_discovery.username(${u}){username,name,profile_picture_url,followers_count,media_count,media.limit(10){like_count,comments_count,timestamp}}`;
+  const d=(await fetch(`https://graph.facebook.com/v19.0/${settings.igUserId}?fields=${encodeURIComponent(f)}&access_token=${settings.igToken}`).then(j)).business_discovery;
+  if(!d)throw new Error("Akkaunt topilmadi yoki Business/Creator akkaunt emas");
+  return{platform:"Instagram",name:d.name||d.username,avatar:d.profile_picture_url,followers:d.followers_count,count:d.media_count,
+    recent:(d.media?.data||[]).map(m=>({title:new Date(m.timestamp).toLocaleDateString(),views:(m.like_count||0)+(m.comments_count||0)}))};
+}
+
+const isoSec=d=>{const m=d.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);return(+m[1]||0)*3600+(+m[2]||0)*60+(+m[3]||0)};
+
+async function analyze(url){
+  if(!settings.ytKey)throw new Error("Admin YouTube API kalitini sozlamagan");
+  const m=url.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{11})/);
+  if(!m)throw new Error("Video havolasi noto'g'ri");
+  const v=(await fetch(`${YT}videos?part=snippet,contentDetails,statistics&id=${m[1]}&key=${settings.ytKey}`).then(j)).items?.[0];
+  if(!v)throw new Error("Video topilmadi");
+  const sec=isoSec(v.contentDetails.duration);
+  if(sec>settings.maxDuration)throw new Error(`Video ${Math.floor(settings.maxDuration/60)} daqiqadan oshmasligi kerak. Sizning video: ${(sec/60).toFixed(1)} daqiqa`);
+
+  const s=v.statistics,sn=v.snippet,views=+s.viewCount||0,likes=+s.likeCount||0,comments=+s.commentCount||0;
+  let p=10;const notes=[];
+  if(sec>=30&&sec<=180){p+=20;notes.push("Ideal davomiylik (30–180 soniya)")}else notes.push("Davomiylik ideal emas");
+  const tl=sn.title.length;
+  if(tl>=30&&tl<=70){p+=15;notes.push("Sarlavha uzunligi optimal")}
+  if(/[?!]|\d/.test(sn.title)){p+=10;notes.push("Sarlavhada savol, undov yoki raqam bor")}
+  if((sn.tags||[]).length>=5){p+=10;notes.push("Teglar yetarli")}
+  const lr=views?likes/views:0;
+  if(lr>=0.04){p+=20;notes.push("Layk nisbati juda yuqori")}else if(lr>=0.02){p+=10;notes.push("Layk nisbati yaxshi")}
+  const cr=views?comments/views:0;
+  if(cr>=0.002){p+=10;notes.push("Izohlar faol")}
+  p=Math.min(95,Math.max(5,p));
+  return{title:sn.title,thumb:(sn.thumbnails.medium||sn.thumbnails.default).url,views,likes,sec,chance:p,
+    predicted:Math.round(views*(1+p/100)),notes};
+}
+
+/* ---------- Views ---------- */
+function render(){
+  const u=me();
+  $("#siteName").textContent=settings.siteName;
+  document.title=settings.siteName+" — Statistika";
+  $("#userBar").innerHTML=u?`<span class="small muted">${esc(u.name)} · ${esc(u.plan)}</span><button class="btn sm" data-act="logout">Chiqish</button>`:"";
+  $("#app").innerHTML=u?dash(u):auth();
+  $("#adminWrap").innerHTML=adminOpen?admin():"";
+}
+
+function auth(){
+  return`<div class="card auth">
+    <div class="tabs">
+      <button class="${authTab==="login"?"on":""}" data-auth="login">Kirish</button>
+      <button class="${authTab==="register"?"on":""}" data-auth="register">Ro'yxatdan o'tish</button>
+    </div>
+    <form id="authForm">
+      ${authTab==="register"?`<input name="name" placeholder="Ismingiz" required/>`:""}
+      <input name="email" type="email" placeholder="Email" required/>
+      <input name="password" type="password" placeholder="Parol (kamida 6 ta belgi)" required minlength="6"/>
+      <button class="btn p full">${authTab==="login"?"Kirish":"Ro'yxatdan o'tish"}</button>
+      <p class="err" id="authErr"></p>
+    </form></div>`;
+}
+
+function dash(u){
+  const left=u.analysesLeft;
+  const plansHtml=settings.plans.map(p=>`<div class="plan"><h3>${esc(p.name)}</h3><div class="price">${esc(p.price)}</div>
+    <p class="muted small">${p.analyses} ta video tahlil</p>
+    <button class="btn p full" style="margin-top:12px" data-act="sub" data-id="${p.id}">Obuna so'rovi</button></div>`).join("");
+  const mine=requests.filter(r=>r.userId===u.id).slice(-3).reverse();
+  return`
+  <div class="card">
+    <span class="pill">Statistika</span>
+    <h2 style="margin-top:12px">Kanal yoki akkaunt statistikasi</h2>
+    <form id="statForm" class="row">
+      <select id="platSel" style="max-width:200px">
+        <option value="youtube" ${platform==="youtube"?"selected":""}>YouTube</option>
+        <option value="instagram" ${platform==="instagram"?"selected":""}>Instagram</option>
+      </select>
+      <input name="q" value="${esc(qVal)}" placeholder="${platform==="youtube"?"Kanal havolasi yoki @username":"Instagram username (masalan: nasa)"}" required/>
+      <button class="btn p" ${busy?"disabled":""}>Ko'rish</button>
+    </form>
+    <div>${statErr?`<p class="err">${esc(statErr)}</p>`:""}${statRes?statView(statRes):""}</div>
+  </div>
+
+  <div class="card">
+    <span class="pill">Video tahlil</span>
+    <h2 style="margin-top:12px">Video reka chiqish ehtimoli</h2>
+    <p class="muted small">Video 3 daqiqadan oshmasligi kerak. Tekin tahlil: ${left>0?`<b>${left} ta qoldi</b>`:"<b>tugagan</b>"}</p>
+    ${left>0?`<form id="vidForm" class="row" style="margin-top:14px">
+      <input name="v" value="${esc(vVal)}" placeholder="YouTube video havolasi" required/>
+      <button class="btn p" ${busy?"disabled":""}>Tahlil qilish</button></form>`
+    :`<div class="card" style="margin:14px 0 0"><p>Tekin tahlil tugadi. Davom etish uchun obuna tanlang.</p>
+        <div class="plans">${plansHtml}</div>
+        <p class="muted small" style="margin-top:12px">To'lov: ${esc(settings.cardInfo||"Admin bilan bog'laning")}</p></div>`}
+    ${vidErr?`<p class="err">${esc(vidErr)}</p>`:""}
+    ${vidRes?vidView(vidRes):""}
+  </div>
+
+  ${mine.length?`<div class="card"><h3>Mening so'rovlarim</h3>${mine.map(r=>`<p class="small">${esc(r.planName)} — <span class="${r.status==="approved"?"ok":"muted"}">${r.status==="approved"?"Tasdiqlangan":r.status==="rejected"?"Rad etilgan":"Kutilmoqda"}</span></p>`).join("")}</div>`:""}
+  ${left>0?`<div class="card"><h3>Obuna tariflari</h3><div class="plans">${plansHtml}</div></div>`:""}`;
+}
+
+function statView(d){
+  const yt=d.platform==="YouTube";
+  return`<div class="flex" style="margin-top:18px">
+      <img class="avatar" src="${esc(d.avatar)}" alt=""/>
+      <div><h3 style="font-size:20px">${esc(d.name)}</h3><span class="pill">${d.platform}</span></div></div>
+    <div class="stats">
+      <div class="stat"><small>${yt?"Obunachilar":"Followers"}</small><div>${fmt(d.followers)}</div></div>
+      ${yt?`<div class="stat"><small>Jami ko'rishlar</small><div>${fmt(d.total)}</div></div>`:""}
+      <div class="stat"><small>${yt?"Videolar":"Postlar"}</small><div>${fmt(d.count)}</div></div>
+    </div>
+    <h3>Oxirgi ${d.recent.length} ta ${yt?"video (ko'rishlar)":"post (layk + izoh)"}</h3>${bars(d.recent)}`;
+}
+
+function bars(items){
+  if(!items.length)return`<p class="muted small">Ma'lumot yo'q</p>`;
+  const max=Math.max(...items.map(i=>i.views),1);
+  return`<div class="chart">${items.map(i=>`<div class="bar" title="${esc(i.title)}: ${fmt(i.views)}"><span style="height:${Math.max(3,i.views/max*100)}%"></span></div>`).join("")}</div>`;
+}
+
+function vidView(v){
+  return`<div class="flex" style="margin-top:18px">
+    <img class="thumb" src="${esc(v.thumb)}" alt=""/>
+    <div style="flex:1;min-width:220px">
+      <h3 style="font-size:18px">${esc(v.title)}</h3>
+      <p class="muted small">Davomiyligi: ${(v.sec/60).toFixed(1)} daqiqa · ${fmt(v.views)} ko'rish · ${fmt(v.likes)} layk</p>
+      <div class="stats" style="margin:12px 0 0">
+        <div class="stat"><small>Reka chiqish ehtimoli</small><div style="color:#a5b4fc">${v.chance}%</div></div>
+        <div class="stat"><small>Taxminiy jami ko'rish (7 kun)</small><div>${fmt(v.predicted)}</div></div>
+      </div>
+      <ul class="notes">${v.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>
+    </div></div>
+    <p class="muted small" style="margin-top:10px">* Bu taxminiy prognoz. Haqiqiy natija algoritm va auditoriyaga bog'liq.</p>`;
+}
+
+function admin(){
+  const tabs=[["settings","Sozlamalar"],["users","Foydalanuvchilar"],["subs","Obunalar"]];
+  let body="";
+  if(adminTab==="settings"){
+    body=`<form id="setForm">
+      <div class="row">
+        <div class="field"><label>Sayt nomi</label><input name="siteName" value="${esc(settings.siteName)}"/></div>
+        <div class="field"><label>Tekin tahlillar soni (yangi foydalanuvchi uchun)</label><input name="freeAnalyses" type="number" min="0" value="${settings.freeAnalyses}"/></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Video max davomiyligi (soniya)</label><input name="maxDuration" type="number" value="${settings.maxDuration}"/></div>
+        <div class="field"><label>To'lov ma'lumoti (karta / izoh)</label><input name="cardInfo" value="${esc(settings.cardInfo)}"/></div>
+      </div>
+      <div class="field"><label>YouTube Data API v3 kaliti</label><input name="ytKey" value="${esc(settings.ytKey)}"/></div>
+      <div class="row">
+        <div class="field"><label>Instagram Graph API token</label><input name="igToken" value="${esc(settings.igToken)}"/></div>
+        <div class="field"><label>Instagram Business User ID</label><input name="igUserId" value="${esc(settings.igUserId)}"/></div>
+      </div>
+      <button class="btn p">Saqlash</button>
+    </form>`;
+  }else if(adminTab==="users"){
+    body=`<div style="overflow:auto"><table>
+      <tr><th>Ism</th><th>Email</th><th>Tarif</th><th>Qolgan tahlil</th><th></th></tr>
+      ${users.map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${esc(u.plan)}</td><td>${u.analysesLeft}</td>
+        <td style="white-space:nowrap"><button class="btn sm" data-act="addAn" data-id="${u.id}">+1 tahlil</button>
+        <button class="btn sm danger" data-act="delUser" data-id="${u.id}">O'chirish</button></td></tr>`).join("")
+        ||`<tr><td colspan="5" class="muted">Foydalanuvchilar yo'q</td></tr>`}
+    </table></div><p class="muted small" style="margin-top:10px">Jami: ${users.length} ta foydalanuvchi</p>`;
+  }else{
+    body=`<h3>So'rovlar</h3>${requests.length?requests.slice().reverse().map(r=>`
+      <div class="stat req"><div><b>${esc(r.userName)}</b> <span class="muted small">${esc(r.email)}</span><br>
+      <span class="small">${esc(r.planName)} · ${r.status}</span></div>
+      ${r.status==="pending"?`<div class="row" style="flex:0"><button class="btn sm p" data-act="approve" data-id="${r.id}">Tasdiqlash</button>
+      <button class="btn sm danger" data-act="reject" data-id="${r.id}">Rad etish</button></div>`:""}</div>`).join("")
+      :`<p class="muted small">So'rovlar yo'q</p>`}
+    <h3 style="margin-top:18px">Tariflar</h3>
+    <form id="planForm">
+      ${settings.plans.map((p,i)=>`<div class="row" style="margin-bottom:8px">
+        <input name="n${i}" value="${esc(p.name)}" placeholder="Nomi"/>
+        <input name="p${i}" value="${esc(p.price)}" placeholder="Narxi"/>
+        <input name="a${i}" type="number" value="${p.analyses}" placeholder="Tahlil soni"/></div>`).join("")}
+      <button class="btn p">Tariflarni saqlash</button>
+    </form>`;
+  }
+  return`<div class="modal" id="modal"><div class="panel">
+    <div class="ptop"><h2>Admin panel</h2><button class="x" data-act="closeAdmin">✕</button></div>
+    <div class="tabs">${tabs.map(([k,t])=>`<button class="${adminTab===k?"on":""}" data-admin="${k}">${t}</button>`).join("")}</div>
+    ${body}</div></div>`;
+}
+
+/* ---------- Events ---------- */
+$("#secret").addEventListener("input",e=>{
+  if(e.target.value.trim()==="2014"){adminOpen=true;e.target.value="";render()}
+});
+
+document.addEventListener("click",e=>{
+  if(e.target.id==="modal"){adminOpen=false;render();return}
+  const el=e.target.closest("[data-auth],[data-admin],[data-act]");
+  if(!el)return;
+  if(el.dataset.auth){authTab=el.dataset.auth;render();return}
+  if(el.dataset.admin){adminTab=el.dataset.admin;render();return}
+  const a=el.dataset.act,id=el.dataset.id;
+
+  if(a==="logout"){session=null;statRes=vidRes=null;save();render()}
+  if(a==="closeAdmin"){adminOpen=false;render()}
+  if(a==="addAn"){const u=users.find(x=>x.id===id);if(u){u.analysesLeft++;save();render()}}
+  if(a==="delUser"){
+    if(confirm("Foydalanuvchini o'chirasizmi?")){
+      users=users.filter(x=>x.id!==id);if(session===id)session=null;save();render();
+    }
+  }
+  if(a==="approve"||a==="reject"){
+    const r=requests.find(x=>x.id===id);
+    if(r&&r.status==="pending"){
+      r.status=a==="approve"?"approved":"rejected";
+      if(a==="approve"){
+        const u=users.find(x=>x.id===r.userId),p=settings.plans.find(x=>x.id===r.planId);
+        if(u&&p){u.analysesLeft+=p.analyses;u.plan=p.name}
+      }
+      save();render();
+    }
+  }
+  if(a==="sub"){
+    const u=me(),p=settings.plans.find(x=>x.id===id);
+    if(!u||!p)return;
+    if(requests.some(r=>r.userId===u.id&&r.status==="pending")){alert("Sizda kutilayotgan so'rov bor");return}
+    requests.push({id:uid(),userId:u.id,userName:u.name,email:u.email,planId:p.id,planName:p.name,status:"pending",date:Date.now()});
+    save();alert("So'rovingiz yuborildi. Admin tasdiqlagach tahlillar qo'shiladi.");render();
+  }
+});
+
+document.addEventListener("input",e=>{
+  if(e.target.name==="q")qVal=e.target.value;
+  if(e.target.name==="v")vVal=e.target.value;
+});
+
+document.addEventListener("change",e=>{
+  if(e.target.id==="platSel"){platform=e.target.value;statRes=null;statErr="";render()}
+});
+
+document.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const f=e.target;
+
+  if(f.id==="authForm"){
+    const d=Object.fromEntries(new FormData(f)),email=d.email.trim().toLowerCase(),err=$("#authErr");
+    if(authTab==="register"){
+      if(users.some(u=>u.email===email)){err.textContent="Bu email ro'yxatdan o'tgan";return}
+      const u={id:uid(),name:d.name.trim(),email,pass:hash(d.password),plan:"Tekin",analysesLeft:settings.freeAnalyses,created:Date.now()};
+      users.push(u);session=u.id;
+    }else{
+      const u=users.find(x=>x.email===email&&x.pass===hash(d.password));
+      if(!u){err.textContent="Email yoki parol noto'g'ri";return}
+      session=u.id;
+    }
+    qVal=vVal="";save();render();return;
+  }
+
+  if(f.id==="statForm"){
+    const q=f.q.value.trim();
+    busy=true;statErr="";statRes=null;render();
+    try{statRes=platform==="youtube"?await getYT(q):await getIG(q)}catch(err){statErr=err.message}
+    busy=false;render();return;
+  }
+
+  if(f.id==="vidForm"){
+    const u=me();if(!u||u.analysesLeft<=0)return;
+    const url=f.v.value.trim();
+    busy=true;vidErr="";vidRes=null;render();
+    try{vidRes=await analyze(url);u.analysesLeft--;save()}catch(err){vidErr=err.message}
+    busy=false;render();return;
+  }
+
+  if(f.id==="setForm"){
+    const d=Object.fromEntries(new FormData(f));
+    settings={...settings,siteName:d.siteName.trim()||"SocialStat",freeAnalyses:+d.freeAnalyses||0,
+      maxDuration:+d.maxDuration||180,cardInfo:d.cardInfo.trim(),ytKey:d.ytKey.trim(),
+      igToken:d.igToken.trim(),igUserId:d.igUserId.trim()};
+    save();alert("Sozlamalar saqlandi");render();return;
+  }
+
+  if(f.id==="planForm"){
+    settings.plans=settings.plans.map((p,i)=>({...p,
+      name:f.elements["n"+i].value.trim()||p.name,
+      price:f.elements["p"+i].value.trim(),
+      analyses:+f.elements["a"+i].value||0}));
+    save();alert("Tariflar saqlandi");render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
